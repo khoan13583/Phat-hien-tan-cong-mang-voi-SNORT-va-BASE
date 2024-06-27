@@ -1,0 +1,41 @@
+
+# $Id: local.rules,v 1.11 2004/07/23 20:15:44 bmc Exp $
+# ----------------
+# LOCAL RULES
+# ----------------
+# This file intentionally does not come with signatures.  Put your local
+# additions here.
+#ICMP Flood
+alert icmp any any -> $HOME_NET any (msg: “ICMP Flood”; GID:1; sid: 1000001; rev:001; classtype: icmp-event; detection_filter:track by_dst, count 30, seconds 3;)
+
+#UDP Flood
+alert udp any any -> $HOME_NET any ( msg:" Possible UDP Flood Attack "; detection_filter: track by_dst, count 1000, seconds 30; GID:3; sid: 10000003; rev:001;)
+
+#TCP Flood
+alert tcp any any -> $HOME_NET 80 (msg: “Possible TCP Flood Attack”; flags: S; GID:2; sid: 10000002; rev:001; classtype:unusual-client-port-connection; threshold: type threshold, track by_dst, count 30, seconds 3;)
+
+#SynFlood
+alert tcp any any -> $HOME_NET 80 (msg: "SYN Floods Attack"; flags: S; sid: 10000005; threshold: type threshold, track by_dst, count 30, seconds 3;)
+
+#HTTP Flood
+alert tcp any any -> $HOME_NET 80 (msg:"GET Request flood attempt"; detection_filter: track by_dst, count 30, seconds 30; pcre:"/GET/i"; GID:4; sid: 10000004; rev:001;)
+
+#Ping of Death
+alert icmp any any -> $HOME_NET any (msg: “Ping of Death Detected”;dsize: > 10000; GID:1; sid: 10000006; rev:1;)
+
+#SQL injection
+alert tcp any any -> any 80 (msg: "Error Based SQL Injection"; content: "%27" ; sid:100000007;)
+alert tcp any any -> any 80 (msg: "Error Based SQL Injection"; content: "%22" ; sid:100000008;)
+
+#NMAP Scan
+#TCP Scan
+alert tcp any any -> $HOME_NET 22 (msg: “NMAP TCP Scan”; sid: 10000009; rev:2;)
+#FIN SCan
+alert tcp any any -> $HOME_NET 22 (msg: “NMAP FIN Scan”; flags:F; sid: 100000010; rev:1;)
+#NULL Scan
+alert tcp any any -> $HOME_NET 22 (msg: “NMAP NULL Scan”; flags:0; sid: 100000011; rev:1;)
+#XMAS Tree Scan
+alert tcp any any -> $HOME_NET 22 (msg: “NMAP XMAS Tree Scan”; flags:FPU; sid: 100000012; rev:1;)
+
+#Ping test
+#alert icmp any any -> $HOME_NET any (msg: “ICMP Ping”; GID:1; sid: 10000015; rev:001; classtype: icmp-event;)
